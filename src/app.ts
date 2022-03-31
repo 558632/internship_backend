@@ -9,5 +9,4 @@ app.use(express.json())
 //Register router
 app.use('/api/v1', router1())
 
-
 export default app
