@@ -1,6 +1,26 @@
 import {Request, Response} from 'express'
+import {PatientModel} from "../../../db/models/patients";
+import {models} from '../../../db'
+import {GENDER} from "../../../utils/enums";
 
-export const workflow = (req: Request, res: Response) => {
+export const workflow = async (req: Request, res: Response) => {
+
+    const {
+        Patient
+    } = models
+
+    const patients: PatientModel[] = await Patient.findAll({
+        where: {
+            gender: GENDER.MALE
+        },
+        logging: true
+    })
+
+    res.json({
+        patients
+    })
+
+    /*
     //res.send('This is my response')
 
     let patients: {}[] = [];
@@ -45,4 +65,5 @@ export const workflow = (req: Request, res: Response) => {
             "totalCount": "počet vrátených záznamov databázou"
         }
     })
+    */
 }

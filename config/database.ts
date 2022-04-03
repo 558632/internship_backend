@@ -11,3 +11,13 @@ export const development = {
 		}
 	}
 }
+export const production = {
+	url: process.env.POSTGRESQL_PROD_URL,
+	options: <Options>{
+		minifyAliases: true,
+		logging: false,
+		pool: {
+			max: 4
+		}
+	}
+}
