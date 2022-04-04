@@ -1,5 +1,7 @@
 import {Request, Response} from 'express'
 import Joi from "joi";
+import { Op } from 'sequelize';
+import { models } from '../../../db'
 import {GENDER, GENDERS} from './../../../utils/enums'
 
 export const schema = Joi.object({
@@ -30,24 +32,57 @@ interface IPatient{
     diagnoseID: number
 }
 
-export const workflow = (req: Request, res: Response) => {
-    // prečítame záznam z databázy kde je id pacienta z parametra
-    // ak nevráti pacienta, pacient neexistuje
-    // v opačnom prípade existuje a aktualizuje sa
-    /*res.json({
-        "messages": [
-            {
-                "message": "Pacient bol zistený v databáze.",
-                "type": "SUCCESS"
-            },
-            {
-                "message": "Údaje pacienta boli aktualizované",
-                "type": "SUCCESS"
-            }
-        ]
-    })*/
+export const workflow = async (req: Request, res: Response) => {
+    const {body} : {body:IPatient} = req
+    const { Patient, Diagnose } = models
 
-    const {body, params, query} : {body:IPatient, params:any, query:any} = req
-    console.log(body)
-    res.json({})
+    const patient_ID = await Patient.findAll({
+        where: {
+            id: req.params.patientID
+        }
+    })
+    if (patient_ID.length === 0){
+        res.status(404).json({
+            message: 'Patient with such a id specified is not present in database.'
+        })
+    }
+    if(!(body.diagnoseID===undefined)){
+        const diagnose = await Diagnose.findAll({
+            where:{
+                id: body.diagnoseID
+            }
+        })
+        if (diagnose.length === 0){
+            res.status(404).json({
+                message: 'Diagnose not found.'
+            })
+        }
+    }if(!(body.identificationNumber===undefined)){
+        const patientID = await Patient.findAll({
+            where: {
+                identificationNumber: body.identificationNumber,
+                id: {
+                    [Op.not]: req.params.patientID
+                }
+            }
+        })
+        if (patientID.length !== 0){
+            res.status(409).json({
+                message: 'Another patient with such a identificationNumber specified is already present in database.'
+            })
+        }
+    }
+    const patient = await Patient.update({
+        ...body
+    },{
+        where:{
+            id: req.params.patientID
+        }
+    })
+    res.status(200).json({
+        "messages":[{
+            "message": "Patient's data updated successfully.'",
+            "type": "SUCCESS"
+        }]
+    })
 }

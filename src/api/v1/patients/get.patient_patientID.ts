@@ -1,35 +1,30 @@
 import {Request, Response} from 'express'
+import Joi from 'joi'
+import {models} from "../../../db";
 
-export const workflow = (req: Request, res: Response) => {
-    // prečítame záznam z databázy kde je id pacienta z parametra
-    // ak nevráti pacienta, pacient neexistuje
-    // v opačnom prípade existuje a vráti sa
-
-    let exampleOne = {
-        "firstName": "string",
-        "lastName": "string",
-        "birthdate": "2022-03-25T11:28:35.964Z",
-        "weight": 0,
-        "height": 0,
-        "identificationNumber": "string",
-        "gender": "MALE",
-        "age": 0,
-        "personType": "ADULT",
-        "substanceAmount": 0,
-        "diagnose": {
-            "id": 0,
-            "name": "string",
-            "description": "string",
-            "substance": {
-                "id": 0,
-                "name": "string",
-                "timeUnit": "SECOND",
-                "halfLife": 0
-            }
-        }
-    }
-
-    res.json({
-        "patient": exampleOne
+export const schema = Joi.object({
+    body: Joi.object(),
+    query: Joi.object(),
+    params: Joi.object({
+        patientID: Joi.number().integer().required()
     })
+})
+
+export const workflow = async (req: Request, res: Response) => {
+    const {params} = req
+    const {Patient} = models
+    const patient = await Patient.findAll({
+        where: {
+            id: params.patientID
+        }
+    })
+    if (patient.length === 0){
+        res.status(404).json({
+            message: 'Patient with such a id specified is not present in database.'
+        })
+    }else{
+        res.status(200).json({
+            patient
+        })
+    }
 }

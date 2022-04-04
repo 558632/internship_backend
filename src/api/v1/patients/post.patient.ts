@@ -31,25 +31,6 @@ interface IPatient{
 
 export const workflow = async (req: Request, res: Response) => {
 
-    //zistenie max id pacienta, nový bude mať id +1
-    //id pacienta do premennej budeme vracať
-    //pridanie do databázy pacienta nového
-
-    /*res.json({
-        "messages": [
-            {
-                "message": "Zadaného údaje nového pacienta prešli kontrolou.",
-                "type": "SUCCESS"
-            },
-            {
-                "message": "Pacient bol úspešne pridaný do databázy.",
-                "type": "SUCCESS"
-            }
-        ],
-        "patient": {
-            "id": 82426777
-        }
-    })*/
     const { Patient, Diagnose } = models
     const {body, params, query} : {body:IPatient, params:any, query:any} = req
 
@@ -65,10 +46,29 @@ export const workflow = async (req: Request, res: Response) => {
         })
     }
 
+    const patientID = await Patient.findAll({
+        where: {
+            identificationNumber: body.identificationNumber
+        }
+    })
+
+    if (patientID.length !== 0){
+        res.status(409).json({
+            message: 'Patient with such a identificationNumber specified is already present in database.'
+        })
+    }
+
     const patient = await Patient.create({
         ...body
     })
-    res.json({
-        id: patient.id
+
+    res.status(200).json({
+        "messages":[{
+            "message": "Patient added to database successfully",
+            "type": "SUCCESS"
+        }],
+        "patient": {
+            "id": patient.id
+        }
     })
 }

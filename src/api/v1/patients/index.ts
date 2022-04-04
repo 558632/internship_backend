@@ -9,10 +9,10 @@ import validate from '../../../middlewares/validate'
 const router = Router()
 
 export default () => {
-    router.get('/', GetPatients.workflow)
+    router.get('/', validate(GetPatients.schema), GetPatients.workflow)
     router.post('/', validate(PostPatient.schema), PostPatient.workflow)
-    router.get('/:patientID', GetPatient_patientID.workflow)
+    router.get('/:patientID', validate(GetPatient_patientID.schema), GetPatient_patientID.workflow)
     router.patch('/:patientID', validate(UpdatePatient_patientID.schema), UpdatePatient_patientID.workflow)
-    router.delete('/:patientID', DeletePatient_patientID.workflow)
+    router.delete('/:patientID', validate(DeletePatient_patientID.schema),DeletePatient_patientID.workflow)
     return router
 }

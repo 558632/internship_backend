@@ -42,7 +42,8 @@ export default (sequelize: Sequelize, modelName: string) =>{
             allowNull: false
         }, identificationNumber: {
             type: DataTypes.STRING(12),
-            allowNull: false
+            allowNull: false,
+            unique: true
         }, gender: {
             type: DataTypes.ENUM(...GENDERS),
             allowNull: false

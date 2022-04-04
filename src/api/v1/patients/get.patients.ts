@@ -1,69 +1,41 @@
 import {Request, Response} from 'express'
 import {PatientModel} from "../../../db/models/patients";
 import {models} from '../../../db'
-import {GENDER} from "../../../utils/enums";
+import {GENDERS, RECORS_LIMITS} from "../../../utils/enums";
+import Joi from "joi";
+
+const defPageLimit:number = Number.MAX_SAFE_INTEGER
+const defOrder:string = "id:asc"
+
+export const schema = Joi.object({
+    body: Joi.object(),
+    query: Joi.object({
+        gender: Joi.string().valid(...GENDERS).optional(),
+        order: Joi.string().pattern(/^[a-zA-Z]*(:)(desc|asc|DESC|ASC)$/).optional(),
+        limit: Joi.number().valid(...RECORS_LIMITS).optional(),
+        page: Joi.number().optional()
+    }),
+    params: Joi.object()
+})
 
 export const workflow = async (req: Request, res: Response) => {
-
-    const {
-        Patient
-    } = models
+    const {query} : {query:any} = req
+    const {Patient} = models
 
     const patients: PatientModel[] = await Patient.findAll({
-        where: {
-            gender: GENDER.MALE
+        limit: (query.limit===undefined) ? defPageLimit : Number(query.limit),
+        offset: ((query.limit===undefined) ? 0 : Number(query.limit)) * ((query.page===undefined) ? 0:(Number(query.page)-1)),
+        where:{
+            gender: query.gender,
         },
+        order: [
+            [((query.order)).substring(0,String(query.order).indexOf(":")),
+                (query.order).substring(String(query.order).indexOf(":")+1)]
+        ],
         logging: true
     })
 
     res.json({
         patients
     })
-
-    /*
-    //res.send('This is my response')
-
-    let patients: {}[] = [];
-
-    // tu budeme pekne vytvárať nové objekty do premennej patients:object súbežne s tým, ako ich budeme čítať z databázy
-    // SQL dotaz na databázu bude obsahovať v klauzule WHERE parameter req.query.gender a v ORDER BY parameter req.query.order
-    // teraz zatiaľ pridávame iba príklad jedného jedinca
-
-    let exampleOne = {
-        "id": "Nezodpovedá funkcionalite - vyžaduje prácu s databázou",
-        "firstName": "string",
-        "lastName": "string",
-        "birthdate": "2022-03-25T11:28:35.964Z",
-        "weight": 0,
-        "height": 0,
-        "identificationNumber": "string",
-        "gender": "MALE",
-        "age": 0,
-        "personType": "ADULT",
-        "substanceAmount": 0,
-        "diagnose": {
-            "id": 0,
-            "name": "string",
-            "description": "string",
-            "substance": {
-                "id": 0,
-                "name": "string",
-                "timeUnit": "SECOND",
-                "halfLife": 0
-            }
-        }
-    }
-
-    patients.push(exampleOne);
-
-    res.json({
-        "patients": patients,
-        "pagination": {
-            "limit": req.query.limit,
-            "page": req.query.page,
-            "totalPages": "počet vrátených záznamov databázou/počet záznamov na stranu",
-            "totalCount": "počet vrátených záznamov databázou"
-        }
-    })
-    */
 }
