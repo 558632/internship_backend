@@ -17,6 +17,11 @@ export enum RECORS_LIMIT {
     _50=50,
     _100=100
 }
+export enum MESSAGE_TYPE{
+    SUCCESS='SUCCESS',
+    FAILURE='FAILURE'
+}
+export const MESSAGE_TYPES = Object.values(MESSAGE_TYPE)
 export const PERSON_TYPES = Object.values(PERSON_TYPE)
 export const RECORS_LIMITS = Object.values(RECORS_LIMIT)
 export const GENDERS = Object.values(GENDER)
