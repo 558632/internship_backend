@@ -6,8 +6,8 @@ import {Models} from './../index'
 export class SubstanceModel extends Model {
     id: number
     name: string
-    timelimit: SUBSTANCE_TIME_UNIT
-    hasLIfe: number
+    timeUnit: SUBSTANCE_TIME_UNIT
+    halfLife: number
     // FK
     diagnoses: DiagnoseModel[]
 }
