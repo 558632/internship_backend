@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from 'express'
 import {PatientModel} from "../../../db/models/patients";
 import {models} from '../../../db'
-import {GENDERS, RECORS_LIMITS} from "../../../utils/enums";
+import {GENDERS, RECORS_LIMITS, PERSON_TYPES, SUBSTANCE_TIME_UNITS} from "../../../utils/enums";
 import Joi from "joi";
 import {map} from "lodash"
 import {calculateAgeFromBirthdate, getPersonType, calculateSubstanceAmount} from "./../../../utils/pat"
@@ -9,7 +9,14 @@ import {calculateAgeFromBirthdate, getPersonType, calculateSubstanceAmount} from
 const defPageLimit:number = Number.MAX_SAFE_INTEGER
 const defOrder:string = "id:asc"
 
-export const schema = Joi.object({
+export const paginationResponse=Joi.object({
+    limit:Joi.number().integer().min(1).required(),
+    page:Joi.number().integer().min(1).required(),
+    totalPages:Joi.number().integer().min(0).required(),
+    totalCount:Joi.number().integer().min(0).required()
+}).required()
+
+export const requestSchema = Joi.object({
     body: Joi.object(),
     query: Joi.object({
         gender: Joi.string().valid(...GENDERS).optional(),
@@ -18,6 +25,37 @@ export const schema = Joi.object({
         page: Joi.number().optional()
     }),
     params: Joi.object()
+})
+
+export const responseSchema = Joi.object({
+    patients:Joi.array()
+        .items(
+            Joi.object({
+                id: Joi.number().integer().min(1).required(),
+                firstName: Joi.string().max(100).required(),
+                lastName: Joi.string().max(100).required(),
+                birthdate: Joi.date().iso().required(),
+                weight: Joi.number().integer().min(1).max(200).required,
+                height: Joi.number().integer().min(1).required(),
+                identificationNumber: Joi.string().alphanum().length(12).required(),
+                gender: Joi.string().valid(...GENDERS).required(),
+                age: Joi.number().integer().min(0).required(),
+                personType: Joi.string().valid(...PERSON_TYPES).required(),
+                substanceAmount: Joi.number().min(1).required(),
+                diagnose: Joi.object({
+                    id: Joi.number().integer().min(1).required(),
+                    name: Joi.string().max(100).required(),
+                    description: Joi.string().max(200).required(),
+                    substance: Joi.object({
+                        id: Joi.number().integer().min(1).required(),
+                        name: Joi.string().max(100).required(),
+                        timeUnit: Joi.string().valid(...SUBSTANCE_TIME_UNITS).required(),
+                        halfLife: Joi.number().min(0).required()
+                    })
+                }).required()
+            }).required()
+        ).required(),
+    pagination: paginationResponse
 })
 
 export const workflow = async (req: Request, res: Response, next: NextFunction) => {

@@ -9,7 +9,7 @@ import validate from '../../../middlewares/validate'
 const router = Router()
 
 export default () => {
-    router.get('/', validate(GetPatients.schema), GetPatients.workflow)
+    router.get('/', validate(GetPatients.requestSchema), GetPatients.workflow)
     router.post('/', validate(PostPatient.schema), PostPatient.workflow)
     router.get('/:patientID', validate(GetPatient_patientID.schema), GetPatient_patientID.workflow)
     router.patch('/:patientID', validate(UpdatePatient_patientID.schema), UpdatePatient_patientID.workflow)
