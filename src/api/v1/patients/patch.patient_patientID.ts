@@ -2,7 +2,7 @@ import {Request, Response} from 'express'
 import Joi from "joi";
 import { Op } from 'sequelize';
 import { models } from '../../../db'
-import {GENDER, GENDERS} from './../../../utils/enums'
+import {GENDER, GENDERS, MESSAGE_TYPE} from './../../../utils/enums'
 
 export const schema = Joi.object({
     body: Joi.object({
@@ -43,7 +43,10 @@ export const workflow = async (req: Request, res: Response) => {
     })
     if (patient_ID.length === 0){
         res.status(404).json({
-            message: 'Patient with such a id specified is not present in database.'
+            message:{
+                txt: 'Patient with such a id specified is not present in database.',
+                type: MESSAGE_TYPE.FAILURE
+            }
         })
     }
     if(!(body.diagnoseID===undefined)){
@@ -54,7 +57,10 @@ export const workflow = async (req: Request, res: Response) => {
         })
         if (diagnose.length === 0){
             res.status(404).json({
-                message: 'Diagnose not found.'
+                message:{
+                    txt: 'Diagnose not found',
+                    type: MESSAGE_TYPE.FAILURE
+                }
             })
         }
     }if(!(body.identificationNumber===undefined)){
@@ -68,7 +74,10 @@ export const workflow = async (req: Request, res: Response) => {
         })
         if (patientID.length !== 0){
             res.status(409).json({
-                message: 'Another patient with such a identificationNumber specified is already present in database.'
+                message:{
+                    txt: 'Another patient with such a identificationNumber specified is already present in database.',
+                    type: MESSAGE_TYPE.FAILURE
+                }
             })
         }
     }
@@ -80,9 +89,9 @@ export const workflow = async (req: Request, res: Response) => {
         }
     })
     res.status(200).json({
-        "messages":[{
-            "message": "Patient's data updated successfully.'",
-            "type": "SUCCESS"
-        }]
+        message:{
+            txt: "Patient's data updated successfully.",
+            type: MESSAGE_TYPE.SUCCESS
+        }
     })
 }

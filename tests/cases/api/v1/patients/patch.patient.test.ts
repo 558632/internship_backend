@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 import supertest = require("supertest");
 import app from './../.././../../../src/app'
+import {MESSAGE_TYPE} from "../../../../../src/utils/enums";
 
 const endpoint = (patientID: number | string) => `/api/v1/patients/${patientID}`
 
@@ -17,7 +18,9 @@ describe(`[PATCH] ${endpoint(':patientID')}`,()=>{
             .send(data)
         console.log(response.error)
         expect(response.status).to.eq(404)
+        expect(response.body.message.type).to.eq(MESSAGE_TYPE.FAILURE)
         expect(response.type).to.eq('application/json')
+
     })
     it('Response should return code 404 - diagnose not found.', async()=> {
         const data={
@@ -31,6 +34,7 @@ describe(`[PATCH] ${endpoint(':patientID')}`,()=>{
             .send(data)
         console.log(response.error)
         expect(response.status).to.eq(404)
+        expect(response.body.message.type).to.eq(MESSAGE_TYPE.FAILURE)
         expect(response.type).to.eq('application/json')
     })
     it('Response should return code 409 - confilict with identificationNumber of another patient present in database..', async()=> {
@@ -45,6 +49,7 @@ describe(`[PATCH] ${endpoint(':patientID')}`,()=>{
             .send(data)
         console.log(response.error)
         expect(response.status).to.eq(409)
+        expect(response.body.message.type).to.eq(MESSAGE_TYPE.FAILURE)
         expect(response.type).to.eq('application/json')
     })
 })
