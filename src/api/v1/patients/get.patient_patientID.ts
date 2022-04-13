@@ -2,6 +2,7 @@ import {Request, Response, NextFunction} from 'express'
 import Joi from 'joi'
 import {models} from "../../../db";
 import {calculateAgeFromBirthdate, getPersonType, calculateSubstanceAmount} from "./../../../utils/pat"
+import {GENDERS, PERSON_TYPES, SUBSTANCE_TIME_UNITS} from "../../../utils/enums";
 
 export const schema = Joi.object({
     body: Joi.object(),
@@ -9,6 +10,33 @@ export const schema = Joi.object({
     params: Joi.object({
         patientID: Joi.number().integer().required()
     })
+})
+
+export const responseSchema = Joi.object({
+    patient:Joi.object({
+        id: Joi.number().integer().min(1).required(),
+        firstName: Joi.string().max(100).required(),
+        lastName: Joi.string().max(100).required(),
+        birthdate: Joi.date().iso().required(),
+        weight: Joi.number().integer().min(1).max(200).required(),
+        height: Joi.number().integer().min(1).required(),
+        identificationNumber: Joi.string().alphanum().length(12).required(),
+        gender: Joi.string().valid(...GENDERS).required(),
+        age: Joi.number().integer().min(0).required(),
+        personType: Joi.string().valid(...PERSON_TYPES).required(),
+        substanceAmount: Joi.number().min(1).required(),
+        diagnose: Joi.object({
+            id: Joi.number().integer().min(1).required(),
+            name: Joi.string().max(100).required(),
+            description: Joi.string().max(200).required(),
+            substance: Joi.object({
+                id: Joi.number().integer().min(1).required(),
+                name: Joi.string().max(100).required(),
+                timeUnit: Joi.string().valid(...SUBSTANCE_TIME_UNITS).required(),
+                halfLife: Joi.number().min(0).required()
+            })
+        }).required()
+    }).required()
 })
 
 export const workflow = async (req: Request, res: Response, next:NextFunction) => {

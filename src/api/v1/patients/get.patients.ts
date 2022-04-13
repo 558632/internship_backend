@@ -35,7 +35,7 @@ export const responseSchema = Joi.object({
                 firstName: Joi.string().max(100).required(),
                 lastName: Joi.string().max(100).required(),
                 birthdate: Joi.date().iso().required(),
-                weight: Joi.number().integer().min(1).max(200).required,
+                weight: Joi.number().integer().min(1).max(200).required(),
                 height: Joi.number().integer().min(1).required(),
                 identificationNumber: Joi.string().alphanum().length(12).required(),
                 gender: Joi.string().valid(...GENDERS).required(),
@@ -147,7 +147,7 @@ export const workflow = async (req: Request, res: Response, next: NextFunction) 
                 }
             }),
             pagination:{
-                offset: ((query.limit===undefined) ? 0 : Number(query.limit)) * ((query.page===undefined) ? 0:(Number(query.page)-1)),
+                page: (query.page===undefined ? 1 : query.page),
                 limit: (query.limit===undefined) ? defPageLimit : Number(query.limit),
                 totalPages: Math.ceil(patientCount / Number((query.limit===undefined) ? defPageLimit : Number(query.limit))) || 0,
                 totalCount: patientCount

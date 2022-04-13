@@ -6,7 +6,7 @@
   "scripts": {
     "debug": "cross-env NODE_ENV=development nodemon --exec 'node --inspect -r dotenv/config -r ts-node/register src/index.ts'",
     "start": "cross-env NODE_ENV=production nodemon --exec 'node --inspect -r dotenv/config -r ts-node/register src/index.ts'",
-    "test": "docker-compose rm --force -s -v postgres_test && docker-compose up --detach postgres_test && cross-env NODE-ENV=test  ts-mocha --config \"./.mocharc.js\""
+    "test": "docker-compose rm --force -s -v postgres_test && docker-compose up --detach postgres_test && cross-env NODE-ENV=test ts-mocha --config \"./.mocharc.js\""
   },
   "author": "Lukáš Jancík",
   "license": "MIT",

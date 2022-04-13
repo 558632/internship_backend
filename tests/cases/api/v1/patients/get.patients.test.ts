@@ -17,22 +17,11 @@ describe(`[GET] ${url}`, () =>{
                 limit: 25,
                 page:1
             })
-        console.log(response)
+        //console.log(response)
         expect(response.status).to.eq(200)
         expect(response.type).to.eq('application/json')
         const validationResult = responseSchema.validate(response.body)
+        //console.log(validationResult.error)
         expect(validationResult.error).to.eq(undefined)
-    })
-
-    it('Response should return list of patients.', async () => {
-        const response = await supertest(app)
-            .get(url)
-            .set('Content-Type', 'application/json')
-            .query({
-                random: 'random'
-            })
-        console.log(response)
-        expect(response.status).to.eq(400)
-        expect(response.type).to.eq('application/json')
     })
 })
