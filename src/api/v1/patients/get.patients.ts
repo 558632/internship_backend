@@ -1,5 +1,4 @@
 import {Request, Response, NextFunction} from 'express'
-import {PatientModel} from "../../../db/models/patients";
 import {models} from '../../../db'
 import {GENDERS, RECORS_LIMITS, PERSON_TYPES, SUBSTANCE_TIME_UNITS} from "../../../utils/enums";
 import Joi from "joi";
