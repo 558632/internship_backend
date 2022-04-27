@@ -21,8 +21,14 @@ export enum MESSAGE_TYPE{
     SUCCESS='SUCCESS',
     FAILURE='FAILURE'
 }
+export enum USER_ROLE{
+    ADMIN='ADMIN',
+    USER='USER',
+    SUPER_ADMIN='SUPER_ADMIN'
+}
 export const MESSAGE_TYPES = Object.values(MESSAGE_TYPE)
 export const PERSON_TYPES = Object.values(PERSON_TYPE)
 export const RECORS_LIMITS = Object.values(RECORS_LIMIT)
 export const GENDERS = Object.values(GENDER)
 export const SUBSTANCE_TIME_UNITS = Object.values(SUBSTANCE_TIME_UNIT)
+export const USER_ROLES = Object.values(USER_ROLE)

@@ -2,7 +2,7 @@ import {Request, Response, NextFunction} from 'express'
 import Joi from 'joi'
 import {models} from "../../../db";
 import {calculateAgeFromBirthdate, getPersonType, calculateSubstanceAmount} from "./../../../utils/pat"
-import {GENDERS, PERSON_TYPES, SUBSTANCE_TIME_UNITS} from "../../../utils/enums";
+import {GENDERS, PERSON_TYPES, SUBSTANCE_TIME_UNITS, USER_ROLE} from "../../../utils/enums";
 
 export const schema = Joi.object({
     body: Joi.object(),
@@ -41,8 +41,8 @@ export const responseSchema = Joi.object({
 
 export const workflow = async (req: Request, res: Response, next:NextFunction) => {
     try{
-        const {params} = req
-        const {Patient,Diagnose,Substance} = models
+        const {params, user}= req
+        const {Patient,Diagnose,Substance,User} = models
 
         const patient = await Patient.findByPk(parseInt(params.patientID, 10),{
             attributes: ['id', 'firstName', 'lastName', 'birthdate', 'weight', 'height', 'identificationNumber', 'gender'],
@@ -60,6 +60,10 @@ export const workflow = async (req: Request, res: Response, next:NextFunction) =
         if (!patient){
             res.status(404).json({
                 message: 'Patient with such a id specified is not present in database.'
+            })
+        }else if (user.role === USER_ROLE.USER && user.identificationNumber !== patient.identificationNumber){
+            res.status(404).json({
+                message: 'Patient do not requires his data.'
             })
         }else{
             const age = calculateAgeFromBirthdate(patient.birthdate)
